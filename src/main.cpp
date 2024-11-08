@@ -18,6 +18,6 @@ int main() {
     }
     //Create a graph object
     //graph.printDict();
-    //graph.printGraph();
     graph.PageRank(power_iterations);
+    //graph.printGraph();
 }

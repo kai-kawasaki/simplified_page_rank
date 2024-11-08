@@ -16,19 +16,30 @@ string AdjacencyList::PageRank(int n){
         i.rank = 1.0 / this->list.size();
     }
     float newRank = 0.0;
-    for (int i = 0; i < n; i++) {
+    for (int i = 0; i < n-1; i++) {
         // calc new rank
-        for (auto &node : this->list) {
+        vector<Node> tempList = this->list;
+        for (auto x : dict) {
+            int index = x.second;
             newRank = 0.0;
-            for (auto &outlink : node.outlinks) {
-                int index = this->dict[outlink];
-                newRank += this->list[index].rank / this->list[index].degree;
+            for (auto y : list[index].inlinks) {
+                int inIndex = dict[y];
+                newRank += tempList[inIndex].rank / tempList[inIndex].outDegree;
             }
-            node.rank = newRank;
+            this->list[index].rank = newRank;
         }
     }
     result = getRanks();
     cout << result;
+    return result;
+}
+
+string AdjacencyList::getRanks() {
+    string result;
+    for (auto i : this->dict) {
+        string rank = to_string(round(this->list[i.second].rank*100.0)/100.0);
+        result += i.first + " " + rank.substr(0,rank.size()-4) + "\n";
+    }
     return result;
 }
 
@@ -39,7 +50,8 @@ void AdjacencyList::addNode(string name) {
         Node newNode;
         newNode.name = name;
         newNode.rank = 0.0;
-        newNode.degree = 0;
+        newNode.inDegree = 0;
+        newNode.outDegree = 0;
         this->list.push_back(newNode);
         this->dict[name] = this->list.size() - 1;
     }
@@ -50,14 +62,22 @@ void AdjacencyList::addEdge(string from, string to) {
     // makes sure all referenced nodes are in the graph
     addNode(from);
     addNode(to);
-    int index = this->dict[from];
-    this->list[index].outlinks.push_back(to);
-    this->list[index].degree++;
+    int fromIndex = this->dict[from];
+    int toIndex = this->dict[to];
+    this->list[fromIndex].outlinks.push_back(to);
+    this->list[fromIndex].outDegree++;
+    this->list[toIndex].inlinks.push_back(from);
+    this->list[toIndex].inDegree++;
 }
 
 void AdjacencyList::printGraph() {
     for (auto i : this->list) {
-        cout << i.name << " - Rank: " << i.rank << " - degree: " << i.degree << endl;
+        cout << i.name << " - Rank: " << i.rank << " - inDegree: " << i.inDegree << " - outDegree: " << i.outDegree << endl;
+        cout << "Inlinks: ";
+        for (auto x : i.inlinks) {
+            cout << x << ", ";
+        }
+        cout << endl << "Outlinks: ";
         for (auto x : i.outlinks) {
             cout << x << ", ";
         }
@@ -71,13 +91,5 @@ void AdjacencyList::printDict() {
     }
 }
 
-string AdjacencyList::getRanks() {
-    string result;
-    for (auto i : this->dict) {
-        string rank = to_string(this->list[i.second].rank);
-        result += i.first + " " + rank.substr(0,rank.size()-4) + "\n";
-    }
-    return result;
-}
 
 

@@ -10,8 +10,10 @@ class AdjacencyList {
     private:
     struct Node {
         string name;
-        int degree;
+        int inDegree;
+        int outDegree;
         vector<string> outlinks;
+        vector<string> inlinks;
         float rank;
     };
     //Think about what member variables you need to initialize
