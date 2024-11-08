@@ -14,3 +14,24 @@ string AdjacencyList::PageRank(int n){
     cout << result;
     return result;
 }
+
+void AdjacencyList::addNode(string name) {
+    // only adds new nodes
+    if (this->dict.find(name) == this->dict.end()) {
+        // creates a new node object
+        Node newNode;
+        newNode.name = name;
+        newNode.rank = 0.0;
+        this->graph.push_back(newNode);
+        this->dict[name] = this->graph.size() - 1;
+    }
+}
+
+void AdjacencyList::addEdge(string from, string to) {
+    // adds an edge to graph
+    // makes sure all referenced nodes are in the graph
+    addNode(from);
+    addNode(to);
+    int index = this->dict[from];
+    this->graph[index].outlinks.push_back(to);
+}
