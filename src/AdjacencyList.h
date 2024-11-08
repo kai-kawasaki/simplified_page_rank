@@ -10,11 +10,12 @@ class AdjacencyList {
     private:
     struct Node {
         string name;
+        int degree;
         vector<string> outlinks;
         float rank;
     };
     //Think about what member variables you need to initialize
-    vector<Node> graph;
+    vector<Node> list;
     map<string, int> dict;
     public:
     //Think about what helper functions you will need in the algorithm
@@ -23,7 +24,7 @@ class AdjacencyList {
     void addEdge(string from, string to);
     void printGraph();
     void printDict();
-    void printRank();
+    string getRanks();
     void printOutlinks();
     void printInlinks();
     void printInlinks(string name);

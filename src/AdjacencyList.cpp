@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cmath>
 #include "AdjacencyList.h"
 
 using namespace std;
@@ -10,7 +11,23 @@ string AdjacencyList::PageRank(int n){
     string result;
 
     // do your page rank
-
+    // initialize all ranks to 1/N
+    for (auto &i : this->list) {
+        i.rank = 1.0 / this->list.size();
+    }
+    float newRank = 0.0;
+    for (int i = 0; i < n; i++) {
+        // calc new rank
+        for (auto &node : this->list) {
+            newRank = 0.0;
+            for (auto &outlink : node.outlinks) {
+                int index = this->dict[outlink];
+                newRank += this->list[index].rank / this->list[index].degree;
+            }
+            node.rank = newRank;
+        }
+    }
+    result = getRanks();
     cout << result;
     return result;
 }
@@ -22,8 +39,9 @@ void AdjacencyList::addNode(string name) {
         Node newNode;
         newNode.name = name;
         newNode.rank = 0.0;
-        this->graph.push_back(newNode);
-        this->dict[name] = this->graph.size() - 1;
+        newNode.degree = 0;
+        this->list.push_back(newNode);
+        this->dict[name] = this->list.size() - 1;
     }
 }
 
@@ -33,5 +51,33 @@ void AdjacencyList::addEdge(string from, string to) {
     addNode(from);
     addNode(to);
     int index = this->dict[from];
-    this->graph[index].outlinks.push_back(to);
+    this->list[index].outlinks.push_back(to);
+    this->list[index].degree++;
 }
+
+void AdjacencyList::printGraph() {
+    for (auto i : this->list) {
+        cout << i.name << " - Rank: " << i.rank << " - degree: " << i.degree << endl;
+        for (auto x : i.outlinks) {
+            cout << x << ", ";
+        }
+        cout << endl;
+    }
+}
+
+void AdjacencyList::printDict() {
+    for (auto i : this->dict) {
+        cout << "Key: " << i.first << ", values: " << i.second << endl;
+    }
+}
+
+string AdjacencyList::getRanks() {
+    string result;
+    for (auto i : this->dict) {
+        string rank = to_string(this->list[i.second].rank);
+        result += i.first + " " + rank.substr(0,rank.size()-4) + "\n";
+    }
+    return result;
+}
+
+
